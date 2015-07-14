@@ -1,0 +1,22 @@
+{
+  "name": "renderselect",
+  "version": "1.0.0",
+  "description": "Renders a HTML string and returns an object with references to chosen elements and a document fragment containing the elements.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hirokiosame/renderSelect.git"
+  },
+  "keywords": [
+    "DOM"
+  ],
+  "author": "Hiroki Osame",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hirokiosame/renderSelect/issues"
+  },
+  "homepage": "https://github.com/hirokiosame/renderSelect#readme"
+}

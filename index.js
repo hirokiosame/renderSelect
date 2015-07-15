@@ -11,7 +11,7 @@ module.exports = function renderSelect(html, selectorAssociation, fn){
 		$container.innerHTML = html;
 
 	// Select selectors
-	var selected = {},
+	var	selected = {},
 		element;
 
 	for( var selector in selectorAssociation ){
@@ -30,9 +30,14 @@ module.exports = function renderSelect(html, selectorAssociation, fn){
 	}
 
 	// Detach from container
-	selected.$ = document.createDocumentFragment();
-	while( $container.firstChild ){
-		selected.$.appendChild( $container.removeChild($container.firstChild) );
+	if( $container.children.length === 1 ){
+		selected.$ = $container.firstChild;
+	}else{
+		selected.$ = document.createDocumentFragment();
+		
+		while( $container.firstChild ){
+			selected.$.appendChild( $container.removeChild($container.firstChild) );
+		}
 	}
 
 	return selected;

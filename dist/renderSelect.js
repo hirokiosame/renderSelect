@@ -52,7 +52,7 @@
 
 	var domify = __webpack_require__(1);
 
-	function replaceArrWith(arrNodes, newNode) {
+	/*function replaceArrWith(arrNodes, newNode) {
 
 		var newNodes;
 		if( newNode instanceof DocumentFragment ){
@@ -100,7 +100,7 @@
 			get: function() { return methods; }
 		};
 	}
-
+	*/
 	function renderSelect(html, fn){
 
 		// Convert handlebars to comments
@@ -109,28 +109,28 @@
 		// Render DOM
 		var	$container = domify(html),
 			selected = $container.querySelectorAll("[" + ATT + "]"),
-			node;
+			node, att;
 
 		// Iterate over comment nodes
 		var fragTree = document.createTreeWalker($container, NodeFilter.SHOW_COMMENT);
 
 		while( fragTree.nextNode() ){
-			Object.defineProperty(
-				this,
-				fragTree.currentNode.nodeValue,			// Label in comment
-				generateSetGet(fragTree.currentNode)	// Methods to replace the comment placeholder DOM with
-			);
+			att = fragTree.currentNode.nodeValue;
+
+			if( this.hasOwnProperty(att) ){ throw new Error("Selected already"); }
+
+			this[att] = fragTree.currentNode;
 		}
 
 		// Iterate over selected
 		for( var i = 0; i < selected.length; i++ ){
 
 			node = selected[i];
+			att = node.getAttribute(ATT);
 
-			// If filter function is passed in, invoke it
-			if( typeof fn === "function" ){ node = fn(node); }
-
-			this[node.getAttribute(ATT)] = node;
+			if( this.hasOwnProperty(att) ){ throw new Error("Selected already"); }
+			
+			this[att] = (typeof fn === "function") ? fn(node) : node;
 		}
 
 		this.$ = (typeof fn === "function") ? fn($container) : $container;

@@ -6,11 +6,12 @@ module.exports = function renderSelect(html, selectorAssociation, fn){
 	 * @return {Object} Object containing references to each selected element and the document fragment in $
 	 */
 
-	// Render DOM
-	var	$container = document.createElement("div");
-		$container.innerHTML = html;
+	var domify = require("domify");
 
-	// Select selectors
+	// Render DOM
+	var	$container = domify(html);
+
+	// Select selectorsa
 	var	selected = {},
 		element;
 
@@ -29,16 +30,7 @@ module.exports = function renderSelect(html, selectorAssociation, fn){
 		selected[ selectorAssociation[selector] ] = element;
 	}
 
-	// Detach from container
-	if( $container.children.length === 1 ){
-		selected.$ = $container.firstChild;
-	}else{
-		selected.$ = document.createDocumentFragment();
-		
-		while( $container.firstChild ){
-			selected.$.appendChild( $container.removeChild($container.firstChild) );
-		}
-	}
+	selected.$ = $container;
 
 	return selected;
 };

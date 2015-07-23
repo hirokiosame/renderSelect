@@ -1,36 +1,97 @@
-module.exports = function renderSelect(html, selectorAssociation, fn){
-	/**
-	 * @param {String} html - HTML string
-	 * @param {Object} selectorAssociation - {selector: propertyName} map eg. { "#blueDiv": "blueDiv" }
-	 * @param {Function} fn - Wrapper in case DOM should be wrapped eg. jQuery
-	 * @return {Object} Object containing references to each selected element and the document fragment in $
-	 */
 
-	var domify = require("domify");
+'use strict';
 
-	// Render DOM
-	var	$container = domify(html);
+// Attribute selector
+var ATT = "data-select";
 
-	// Select selectorsa
-	var	selected = {},
-		element;
+var domify = require("domify");
 
-	for( var selector in selectorAssociation ){
+function replaceArrWith(arrNodes, newNode) {
 
-		// If not property or invalid selector
-		if( !selectorAssociation.hasOwnProperty(selector) || selector.length === 0 ){ continue; }
-
-		// If failed to select, ignore
-		if( !(element = $container.querySelector(selector)) ){ continue; }
-
-		// Reference
-		if( typeof fn === "function" ){ element = fn(element); }
-
-		// Store reference
-		selected[ selectorAssociation[selector] ] = element;
+	var newNodes;
+	if( newNode instanceof DocumentFragment ){
+		newNodes = [].slice.apply(newNode.childNodes);
 	}
 
-	selected.$ = (typeof fn === "function") ? fn($container) : $container;
+	// Replace first
+	var oldNode = arrNodes.shift();
+		oldNode.parentNode.replaceChild(newNode, oldNode);
 
-	return selected;
+	// Unrender
+	while( oldNode = arrNodes.shift() ){
+		oldNode.parentNode.removeChild(oldNode);
+	}
+
+	[].push.apply(arrNodes, newNodes ? newNodes : [newNode]);
+}
+
+function generateSetGet(commentNode) {
+
+	// Inherit these methods instead!
+	var methods = {
+		nodes: [commentNode],
+		addClass: null,
+		removeClass: null,
+		text: function(str) {
+			replaceArrWith(this.nodes, document.createTextNode(str));
+		},
+		html: function(str){
+			replaceArrWith(this.nodes, renderHTML([], str));
+		},
+		place: function(templateObj){
+			replaceArrWith(this.nodes, templateObj.$);
+		}
+	};
+
+	return {
+		set: function(value) {
+			if( value instanceof renderSelect ){
+				methods.place(value);
+			}else{
+				methods.text(value);
+			}
+		},
+		get: function() { return methods; }
+	};
+}
+
+function renderSelect(html, fn){
+
+	// Convert handlebars to comments
+	html = html.replace(/{{/g, '<!--').replace(/}}/g, '-->').replace(/^\s+|\s+$/g, '');
+
+	// Render DOM
+	var	$container = domify(html),
+		selected = $container.querySelectorAll("[" + ATT + "]"),
+		node;
+
+	// Iterate over comment nodes
+	var fragTree = document.createTreeWalker($container, NodeFilter.SHOW_COMMENT);
+
+	while( fragTree.nextNode() ){
+		Object.defineProperty(
+			this,
+			fragTree.currentNode.nodeValue,			// Label in comment
+			generateSetGet(fragTree.currentNode)	// Methods to replace the comment placeholder DOM with
+		);
+	}
+
+	// Iterate over selected
+	for( var i = 0; i < selected.length; i++ ){
+
+		node = selected[i];
+
+		// If filter function is passed in, invoke it
+		if( typeof fn === "function" ){ node = fn(node); }
+
+		this[node.getAttribute(ATT)] = node;
+	}
+
+	this.$ = (typeof fn === "function") ? fn($container) : $container;
 };
+
+module.exports = function(html, fn) {
+	return (new renderSelect(html, fn));
+};
+
+window.renderSelect = module.exports;

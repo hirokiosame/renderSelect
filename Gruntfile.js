@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 				],
 				tasks: ['_develop'],
 				options: {
-					livereload: true
+					// livereload: true
 				}
 			},
 			options: {

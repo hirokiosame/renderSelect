@@ -30,7 +30,7 @@ module.exports = function renderSelect(html, selectorAssociation, fn){
 		selected[ selectorAssociation[selector] ] = element;
 	}
 
-	selected.$ = $container;
+	selected.$ = (typeof fn === "function") ? fn($container) : $container;
 
 	return selected;
 };

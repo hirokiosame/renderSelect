@@ -81,10 +81,7 @@ function renderSelect(html, fn){
 
 		node = selected[i];
 
-		// If filter function is passed in, invoke it
-		if( typeof fn === "function" ){ node = fn(node); }
-
-		this[node.getAttribute(ATT)] = node;
+		this[node.getAttribute(ATT)] = (typeof fn === "function") ? fn(node) : node;
 	}
 
 	this.$ = (typeof fn === "function") ? fn($container) : $container;

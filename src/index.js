@@ -21,11 +21,12 @@ function renderSelect(html, fn){
 
 	while( fragTree.nextNode() ){
 
-		att = fragTree.currentNode.nodeValue;
+		node = fragTree.currentNode;
+		att = node.nodeValue;
 
 		if( this.hasOwnProperty(att) ){ throw new Error("Selected already"); }
 
-		this[att] = fragTree.currentNode;
+		this[att] = (typeof fn === "function") ? fn(node) : node;
 	}
 
 	// Iterate over selected

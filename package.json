@@ -29,6 +29,6 @@
     "webpack-dev-server": "^1.10.1"
   },
   "dependencies": {
-    "domify": "hirokiosame/domify"
+    "domify": "component/domify"
   }
 }

@@ -15,6 +15,5 @@
     "tests"
   ],
   "dependencies": {
-    "domify": "component/domify#~1.4.0"
   }
 }
